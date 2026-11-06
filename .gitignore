@@ -1,0 +1,10 @@
+node_modules
+out
+dist
+coverage
+test-results
+playwright-report
+fixtures/*
+!fixtures/samples/
+.DS_Store
+*.log

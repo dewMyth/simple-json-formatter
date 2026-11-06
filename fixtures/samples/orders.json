@@ -1,0 +1,10 @@
+{
+  "data": {
+    "meta": { "page": 1, "source": "api" },
+    "orders": [
+      { "id": 1, "customer": { "name": "Alice", "address": { "city": "Colombo" } }, "tags": ["vip", "new"], "total": 12.5, "paid": true, "note": null },
+      { "id": 2, "customer": { "name": "Bob \"B\"", "address": { "city": "Oslo, NO" } }, "tags": [], "total": 7, "paid": false, "coupon": "=SUM(A1)" },
+      { "id": 3, "customer": { "name": "Chandra", "address": { "city": "Lagos" } }, "tags": ["emoji 🎉"], "total": 99.99, "paid": true, "note": "line1\nline2", "items": [{ "sku": "A", "qty": 2 }] }
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+id,customer.name,customer.address.city,tags,total,paid,note,coupon,items
+1,Alice,Colombo,vip; new,12.5,true,,,
+2,"Bob ""B""","Oslo, NO",,7,false,,'=SUM(A1),
+3,Chandra,Lagos,emoji 🎉,99.99,true,"line1
+line2",,"[{""sku"":""A"",""qty"":2}]"

@@ -1,0 +1,242 @@
+/*
+ * Theme tokens. Every colour in the UI comes from these variables.
+ * Badge fg/bg pairs are checked for WCAG AA contrast by src/renderer/lib/contrast.test.ts —
+ * keep them as opaque 6-digit hex values so that test can read them.
+ *
+ * The plan's base hues (#2563eb, #7c3aed, #16a34a, #ea580c, #db2777, #6b7280, #d97706) are kept as
+ * --type-* accents (badge borders, focus, chart-like accents). Text drawn in those exact hues on white
+ * would fail AA for several of them, so badge/value text uses darker shades of the same hue.
+ */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --surface-3: #e6e9ee;
+  --border: #d9dde4;
+  --border-strong: #b8bfca;
+  --text: #1a1d23;
+  --text-muted: #5b6372;
+  --text-faint: #8a92a0;
+  --accent: #2563eb;
+  --accent-text: #ffffff;
+  --accent-soft: #e0eaff;
+  --focus: #2563eb;
+  --row-bg: #ffffff;
+  --row-hover: #f3f6fb;
+  --row-selected: #dde8fd;
+  --row-match: #fff4c2;
+  --mark-bg: #ffe066;
+  --mark-text: #1a1d23;
+  --indent-guide: #eceff3;
+  --danger: #b91c1c;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --warn: #92400e;
+  --warn-bg: #fffbeb;
+  --warn-border: #fde68a;
+  --ok: #166534;
+  --overlay: rgba(246, 247, 249, 0.72);
+  --shadow: 0 8px 28px rgba(15, 23, 42, 0.16);
+
+  --type-object: #2563eb;
+  --type-array: #7c3aed;
+  --type-string: #16a34a;
+  --type-number: #ea580c;
+  --type-boolean: #db2777;
+  --type-null: #6b7280;
+  --type-bignum: #d97706;
+
+  --badge-object-fg: #1d4ed8;
+  --badge-object-bg: #dbeafe;
+  --badge-array-fg: #6d28d9;
+  --badge-array-bg: #ede9fe;
+  --badge-string-fg: #166534;
+  --badge-string-bg: #dcfce7;
+  --badge-number-fg: #9a3412;
+  --badge-number-bg: #ffedd5;
+  --badge-boolean-fg: #9d174d;
+  --badge-boolean-bg: #fce7f3;
+  --badge-null-fg: #4b5563;
+  --badge-null-bg: #f3f4f6;
+  --badge-bignum-fg: #92400e;
+  --badge-bignum-bg: #fef3c7;
+
+  /* syntax colours in the editor */
+  --tok-key: #1d4ed8;
+  --tok-string: #166534;
+  --tok-number: #9a3412;
+  --tok-bool: #9d174d;
+  --tok-null: #4b5563;
+  --tok-punct: #5b6372;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #131417;
+    --surface: #1b1c20;
+    --surface-2: #23252a;
+    --surface-3: #2d3036;
+    --border: #33363d;
+    --border-strong: #4a4e57;
+    --text: #e6e8eb;
+    --text-muted: #a3a9b4;
+    --text-faint: #767d89;
+    --accent: #5b8def;
+    --accent-text: #0b1220;
+    --accent-soft: #1f2d4d;
+    --focus: #7aa5ff;
+    --row-bg: #1b1c20;
+    --row-hover: #23262c;
+    --row-selected: #233457;
+    --row-match: #3d3514;
+    --mark-bg: #8a6d00;
+    --mark-text: #ffffff;
+    --indent-guide: #262930;
+    --danger: #fca5a5;
+    --danger-bg: #3a1618;
+    --danger-border: #6b2326;
+    --warn: #fcd34d;
+    --warn-bg: #352a0b;
+    --warn-border: #5c4810;
+    --ok: #86efac;
+    --overlay: rgba(19, 20, 23, 0.72);
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+
+    --type-object: #60a5fa;
+    --type-array: #a78bfa;
+    --type-string: #4ade80;
+    --type-number: #fb923c;
+    --type-boolean: #f472b6;
+    --type-null: #9ca3af;
+    --type-bignum: #fbbf24;
+
+    --badge-object-fg: #93c5fd;
+    --badge-object-bg: #1e3a5f;
+    --badge-array-fg: #c4b5fd;
+    --badge-array-bg: #2e1f5e;
+    --badge-string-fg: #86efac;
+    --badge-string-bg: #14391f;
+    --badge-number-fg: #fdba74;
+    --badge-number-bg: #43230f;
+    --badge-boolean-fg: #f9a8d4;
+    --badge-boolean-bg: #4a1a33;
+    --badge-null-fg: #d1d5db;
+    --badge-null-bg: #33363d;
+    --badge-bignum-fg: #fcd34d;
+    --badge-bignum-bg: #40300b;
+
+    --tok-key: #93c5fd;
+    --tok-string: #86efac;
+    --tok-number: #fdba74;
+    --tok-bool: #f9a8d4;
+    --tok-null: #d1d5db;
+    --tok-punct: #a3a9b4;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #131417;
+  --surface: #1b1c20;
+  --surface-2: #23252a;
+  --surface-3: #2d3036;
+  --border: #33363d;
+  --border-strong: #4a4e57;
+  --text: #e6e8eb;
+  --text-muted: #a3a9b4;
+  --text-faint: #767d89;
+  --accent: #5b8def;
+  --accent-text: #0b1220;
+  --accent-soft: #1f2d4d;
+  --focus: #7aa5ff;
+  --row-bg: #1b1c20;
+  --row-hover: #23262c;
+  --row-selected: #233457;
+  --row-match: #3d3514;
+  --mark-bg: #8a6d00;
+  --mark-text: #ffffff;
+  --indent-guide: #262930;
+  --danger: #fca5a5;
+  --danger-bg: #3a1618;
+  --danger-border: #6b2326;
+  --warn: #fcd34d;
+  --warn-bg: #352a0b;
+  --warn-border: #5c4810;
+  --ok: #86efac;
+  --overlay: rgba(19, 20, 23, 0.72);
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+
+  --type-object: #60a5fa;
+  --type-array: #a78bfa;
+  --type-string: #4ade80;
+  --type-number: #fb923c;
+  --type-boolean: #f472b6;
+  --type-null: #9ca3af;
+  --type-bignum: #fbbf24;
+
+  --badge-object-fg: #93c5fd;
+  --badge-object-bg: #1e3a5f;
+  --badge-array-fg: #c4b5fd;
+  --badge-array-bg: #2e1f5e;
+  --badge-string-fg: #86efac;
+  --badge-string-bg: #14391f;
+  --badge-number-fg: #fdba74;
+  --badge-number-bg: #43230f;
+  --badge-boolean-fg: #f9a8d4;
+  --badge-boolean-bg: #4a1a33;
+  --badge-null-fg: #d1d5db;
+  --badge-null-bg: #33363d;
+  --badge-bignum-fg: #fcd34d;
+  --badge-bignum-bg: #40300b;
+
+  --tok-key: #93c5fd;
+  --tok-string: #86efac;
+  --tok-number: #fdba74;
+  --tok-bool: #f9a8d4;
+  --tok-null: #d1d5db;
+  --tok-punct: #a3a9b4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font:
+    13px/1.4 -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    system-ui,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.mono {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 12px;
+}
