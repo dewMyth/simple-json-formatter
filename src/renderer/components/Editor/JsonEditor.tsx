@@ -103,6 +103,22 @@ export function JsonEditor(): React.JSX.Element {
   const host = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const push = useAppStore((st) => st.editorPush);
+  const pendingRef = useRef<{ text: string; seq: number } | null>(null);
+  const appliedRef = useRef(0);
+
+  /** Applies text pushed into the editor that hasn't been applied yet. */
+  const applyPending = (): void => {
+    const view = viewRef.current;
+    const p = pendingRef.current;
+    if (!view || !p) return;
+    pendingRef.current = null;
+    appliedRef.current = p.seq;
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: p.text },
+      selection: { anchor: 0 },
+      scrollIntoView: true,
+    });
+  };
 
   useEffect(() => {
     const view = new EditorView({
@@ -144,9 +160,10 @@ export function JsonEditor(): React.JSX.Element {
     });
     viewRef.current = view;
     registerEditor({
-      getText: () => view.state.doc.toString(),
-      length: () => view.state.doc.length,
+      getText: () => pendingRef.current?.text ?? view.state.doc.toString(),
+      length: () => pendingRef.current?.text.length ?? view.state.doc.length,
       jumpTo: (line, column) => {
+        applyPending();
         const doc = view.state.doc;
         const l = doc.line(Math.max(1, Math.min(line, doc.lines)));
         const pos = Math.min(l.from + Math.max(0, column - 1), l.to);
@@ -169,14 +186,16 @@ export function JsonEditor(): React.JSX.Element {
     };
   }, []);
 
+  // Text pushed by a load is applied in its own idle-time task, after the tree has rendered. Splitting a
+  // multi-MB document into lines and the first syntax parse are the most expensive UI-thread work in a
+  // load, so they must not share a task with the tree render.
+  // It is applied even while the Text tab is hidden: applying it to a hidden editor is cheap, whereas
+  // applying it right after the editor becomes visible forces a full layout (~0.7 s for medium.json).
   useEffect(() => {
-    const view = viewRef.current;
-    if (!view || push.seq === 0) return;
-    view.dispatch({
-      changes: { from: 0, to: view.state.doc.length, insert: push.text },
-      selection: { anchor: 0 },
-      scrollIntoView: true,
-    });
+    pendingRef.current = push.seq > appliedRef.current ? push : null;
+    if (!pendingRef.current) return;
+    const handle = requestIdleCallback(applyPending, { timeout: 250 });
+    return () => cancelIdleCallback(handle);
   }, [push]);
 
   return <div ref={host} className={s.editor} />;

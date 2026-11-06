@@ -322,8 +322,12 @@
   gap: 8px;
   align-items: center;
   padding: 24px 28px;
-  pointer-events: auto;
+  /* Floats over the editor: let clicks through to it, except on the buttons. */
+  pointer-events: none;
   max-width: calc(100% - 32px);
+}
+.empty button {
+  pointer-events: auto;
 }
 .emptyTitle {
   font-size: 18px;

@@ -155,8 +155,11 @@ test.describe('JSONLens', () => {
   });
 
   test('phase 2: Cmd/Ctrl+V into an empty editor formats automatically', async () => {
+    // A small window puts the empty-state hint over the editor; clicks must still reach the editor.
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setSize(900, 600));
+    await page.waitForTimeout(200);
     await setClipboard(app, '{"b":[1,2],"a":"x"}');
-    await page.locator('.cm-content').click();
+    await page.locator('.cm-content').click({ timeout: 5000 });
     await page.evaluate(() => {
       const dt = new DataTransfer();
       dt.setData('text/plain', '{"b":[1,2],"a":"x"}');

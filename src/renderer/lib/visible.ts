@@ -1,6 +1,11 @@
 import { NodeFlag, NodeType, type StringTable, type TreeIndex } from '@shared/types';
 import { jsonPath } from '@shared/path';
 
+// One shared formatter: Number#toLocaleString builds a new Intl formatter on every call, which showed
+// up as the top self-time function when rendering tree rows.
+const intFormat = new Intl.NumberFormat('en-US');
+export const fmtInt = (n: number): string => intFormat.format(n);
+
 /** Visible rows in pre-order, skipping collapsed subtrees. O(visible rows). */
 export function computeVisible(idx: TreeIndex, expanded: Uint8Array): Int32Array {
   const out = new Int32Array(idx.n);
@@ -70,7 +75,7 @@ export function getPreview(idx: TreeIndex, i: number): string {
 
 /** `{12}` / `[3400]` for containers. */
 export function containerSummary(idx: TreeIndex, i: number): string {
-  const n = idx.childCount[i].toLocaleString('en-US');
+  const n = fmtInt(idx.childCount[i]);
   return idx.type[i] === NodeType.Object ? `{${n}}` : `[${n}]`;
 }
 
@@ -159,5 +164,3 @@ export function formatBytes(b: number): string {
   }
   return `${u === 0 ? v : v.toFixed(1)} ${units[u]}`;
 }
-
-export const fmtInt = (n: number): string => n.toLocaleString('en-US');
