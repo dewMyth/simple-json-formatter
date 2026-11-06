@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ['v*', 'release/*']
   pull_request:
   workflow_dispatch:
 
@@ -82,7 +82,7 @@ jobs:
   package:
     name: Package (${{ matrix.os }})
     needs: e2e
-    # Installers only for main, version tags and manual runs, not for every PR.
+    # Installers only for main, release tags and manual runs, not for every PR.
     if: github.event_name != 'pull_request'
     strategy:
       fail-fast: false
@@ -117,3 +117,28 @@ jobs:
             dist/*.AppImage
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    name: Attach installers to the GitHub release
+    needs: package
+    # Only for tag pushes (v1.2.3 or release/1.2.3).
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: installers-*
+          path: installers
+          merge-multiple: true
+      - name: Create the release if needed, then upload the installers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          ls -la installers
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "$TAG" --generate-notes --verify-tag
+          gh release upload "$TAG" installers/* --clobber

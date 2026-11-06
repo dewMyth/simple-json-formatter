@@ -1,5 +1,7 @@
 appId: com.jsonlens.app
 productName: JSONLens
+# e.g. JSONLens-0.1.0-mac-arm64.dmg, JSONLens-0.1.0-win-x64.exe, JSONLens-0.1.0-linux-x86_64.AppImage
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 directories:
   output: dist
   buildResources: build
