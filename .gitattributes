@@ -1,0 +1,6 @@
+# Keep LF everywhere, including Windows checkouts: the e2e golden CSV is compared byte for byte,
+# and Prettier expects LF.
+* text=auto eol=lf
+*.png binary
+*.icns binary
+*.ico binary
