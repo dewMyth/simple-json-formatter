@@ -98,30 +98,52 @@ test.describe('JSONLens', () => {
   test('no main-thread task over 100 ms during any operation on medium.json', async () => {
     test.skip(!existsSync(fixture('medium.json')), 'run npm run fixtures');
     await startLongTaskObserver(page);
-    await openFixture(page, fixture('medium.json'));
     const out = mkdtempSync(join(tmpdir(), 'jsonlens-out-'));
-    await page.getByTestId('btn-expand-all').click();
-    await page.getByTestId('tree').evaluate((el) => (el.scrollTop = el.scrollHeight / 2));
-    await page.waitForTimeout(100);
-    await page.getByTestId('btn-collapse-all').click();
-    await page.getByTestId('search-input').fill('Colombo');
-    await expect(page.getByTestId('search-count')).toContainText(' of ');
-    await page.getByTestId('search-input').press('Enter');
-    await page.getByTestId('tab-text').click();
-    await page.getByTestId('btn-format').click();
-    await expect.poll(() => state(page, 's.job === null && s.tab === "viewer"')).toBe(true);
-    await page.getByTestId('btn-export-csv').click();
-    await expect(page.getByTestId('csv-totals')).toContainText('rows');
-    await stubSaveDialog(app, join(out, 'm.csv'));
-    await page.getByTestId('csv-export').click();
-    await expect(page.getByTestId('toasts')).toContainText('Saved');
-    await stubSaveDialog(app, join(out, 'm.json'));
-    await page.evaluate(() => window.__jsonlens.actions.saveJson());
-    await expect.poll(() => existsSync(join(out, 'm.json'))).toBe(true);
-    await page.waitForTimeout(300);
-    const tasks = await longTasks(page);
-    console.log(`all operations: long tasks ${JSON.stringify(tasks.map(Math.round))}`);
-    expect(Math.max(0, ...tasks)).toBeLessThan(budget(100));
+    // Long tasks are recorded per step, so a failure names the operation that blocked the UI thread.
+    const perStep: Array<[string, number[]]> = [];
+    const step = async (name: string, fn: () => Promise<unknown>): Promise<void> => {
+      await fn();
+      await page.waitForTimeout(150); // let follow-up work (render, idle callbacks) land in this step
+      perStep.push([name, (await page.evaluate(() => window.__long.splice(0))).map(Math.round)]);
+    };
+    await step('load medium.json', () => openFixture(page, fixture('medium.json')));
+    await step('expand all', () => page.getByTestId('btn-expand-all').click());
+    await step('scroll to middle', () =>
+      page.getByTestId('tree').evaluate((el) => (el.scrollTop = el.scrollHeight / 2)),
+    );
+    await step('collapse all', () => page.getByTestId('btn-collapse-all').click());
+    await step('search', async () => {
+      await page.getByTestId('search-input').fill('Colombo');
+      await expect(page.getByTestId('search-count')).toContainText(' of ');
+    });
+    await step('next result', () => page.getByTestId('search-input').press('Enter'));
+    await step('open Text tab', () => page.getByTestId('tab-text').click());
+    await step('format', async () => {
+      await page.getByTestId('btn-format').click();
+      await expect.poll(() => state(page, 's.job === null && s.tab === "viewer"')).toBe(true);
+    });
+    await step('CSV dialog + preview', async () => {
+      await page.getByTestId('btn-export-csv').click();
+      await expect(page.getByTestId('csv-totals')).toContainText('rows');
+    });
+    await step('CSV export', async () => {
+      await stubSaveDialog(app, join(out, 'm.csv'));
+      await page.getByTestId('csv-export').click();
+      await expect(page.getByTestId('toasts')).toContainText('Saved');
+    });
+    await step('save JSON', async () => {
+      await stubSaveDialog(app, join(out, 'm.json'));
+      await page.evaluate(() => window.__jsonlens.actions.saveJson());
+      await expect.poll(() => existsSync(join(out, 'm.json'))).toBe(true);
+    });
+    const report = perStep.map(([n, t]) => `${n}: ${JSON.stringify(t)}`).join('; ');
+    console.log(`long tasks per step — ${report}`);
+    const [worstStep, worst] = perStep
+      .map(([n, t]) => [n, Math.max(0, ...t)] as const)
+      .reduce((a, b) => (b[1] > a[1] ? b : a));
+    expect(worst, `slowest step "${worstStep}" (${worst} ms). All steps — ${report}`).toBeLessThan(
+      budget(100),
+    );
   });
 
   test('phase 2: pasting each messy input gives valid pretty JSON', async () => {
